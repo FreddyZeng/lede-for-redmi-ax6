@@ -6,15 +6,49 @@ on:
   schedule:
     # 对应的是 UTC 时间，需要转换，0 代表北京时间8点，每天早上 8 点同步一次
     - cron: 0 0 * * *
+  workflow_dispatch:  # click the button on Github repo!
+
 jobs:
-  sync:
+  sync_latest_from_upstream:
     runs-on: ubuntu-latest
+    name: Sync latest commits from upstream repo
+
     steps:
-      - uses: tgymnich/fork-sync@v1.6.3
-        with:
-          # 需要自己在 https://github.com/settings/tokens 创建个 token，专门用于此操作
-          token: ${{ secrets.workflows_token }}
-          owner: hochenchong
-          base: master
-          head: master
-          auto_approve: true
+    # REQUIRED step
+    # Step 1: run a standard checkout action, provided by github
+    - name: Checkout target repo
+      uses: actions/checkout@v2
+      with:
+        # optional: set the branch to checkout,
+        # sync action checks out your 'target_sync_branch' anyway
+        ref:  master
+        # REQUIRED if your upstream repo is private (see wiki)
+        persist-credentials: false
+
+    # REQUIRED step
+    # Step 2: run the sync action
+    - name: Sync upstream changes
+      id: sync
+      uses: aormsby/Fork-Sync-With-Upstream-action@v3.3
+      with:
+        target_sync_branch: master
+        # REQUIRED 'target_repo_token' exactly like this!
+        target_repo_token: ${{ secrets.workflows_token }}
+        upstream_sync_branch: main
+        upstream_sync_repo: coolsnowwolf/lede
+        # upstream_repo_access_token: ${{ secrets.UPSTREAM_REPO_SECRET }}
+
+        # Set test_mode true to run tests instead of the true action!!
+        # test_mode: true
+      
+    # Step 3: Display a sample message based on the sync output var 'has_new_commits'
+    - name: New commits found
+      if: steps.sync.outputs.has_new_commits == 'true'
+      run: echo "New commits were found to sync."
+    
+    - name: No new commits
+      if: steps.sync.outputs.has_new_commits == 'false'
+      run: echo "There were no new commits."
+      
+    - name: Show value of 'has_new_commits'
+      run: echo ${{ steps.sync.outputs.has_new_commits }}
