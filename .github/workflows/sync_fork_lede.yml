@@ -11,10 +11,10 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: tgymnich/fork-sync@v1.4
+      - uses: tgymnich/fork-sync@v1.6.3
         with:
           # 需要自己在 https://github.com/settings/tokens 创建个 token，专门用于此操作
           token: ${{ secrets.workflows_token }}
-          owner: hochenchong
+          owner: coolsnowwolf
           base: master
           head: master
