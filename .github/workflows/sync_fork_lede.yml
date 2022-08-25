@@ -2,6 +2,7 @@
 name: Sync Fork
 
 on:
+  push: # push 时触发, 主要是为了测试配置有没有问题
   schedule:
     # 对应的是 UTC 时间，需要转换，0 代表北京时间8点，每天早上 8 点同步一次
     - cron: 0 11 * * *
@@ -12,6 +13,6 @@ jobs:
       - uses: tgymnich/fork-sync@v1.4
         with:
           # fork 的上游仓库 user
-          owner: coolsnowwolf
+          owner: hochenchong
           base: master
           head: master
