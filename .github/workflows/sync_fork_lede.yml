@@ -5,7 +5,7 @@ on:
   push: # push 时触发, 主要是为了测试配置有没有问题
   schedule:
     # 对应的是 UTC 时间，需要转换，0 代表北京时间8点，每天早上 8 点同步一次
-    - cron: 0 11 * * *
+    - cron: 0 0 * * *
   workflow_dispatch: # on button click
 jobs:
   sync:
@@ -13,7 +13,8 @@ jobs:
     steps:
       - uses: tgymnich/fork-sync@v1.4
         with:
-          token: ${{ secrets.PERSONAL_TOKEN }}
+          # 需要自己在 https://github.com/settings/tokens 创建个 token，专门用于此操作
+          token: ${{ secrets.workflows_token }}
           owner: hochenchong
           base: master
           head: master
